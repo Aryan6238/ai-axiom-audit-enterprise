@@ -118,24 +118,26 @@ const App: React.FC = () => {
 
     } catch (e: any) {
       console.error("Audit Execution Failed:", e);
-      // Detailed error reporting for the user
-      const errorMsg = e.message || "";
-      if (errorMsg.includes("API_KEY_INVALID")) {
-        setError("CRITICAL: Your Gemini API Key is invalid. Check Vercel Environment Variables.");
-      } else if (errorMsg.includes("404") || errorMsg.includes("model")) {
-        setError("CRITICAL: The requested AI Model (Gemini 3 Pro) is not available for your API key yet.");
+      const errorMsg = e.message || "Unknown communication error.";
+      
+      // Enhanced Error Filtering for more accurate user feedback
+      if (errorMsg.includes("API_KEY_INVALID") || errorMsg.includes("API key not found") || errorMsg.includes("403")) {
+        setError("CRITICAL: Your Gemini API Key is invalid or not yet propagated. Please check Vercel Settings and REDEPLOY.");
+      } else if (errorMsg.includes("model not found") || errorMsg.includes("404") || errorMsg.includes("not enabled")) {
+        setError("CRITICAL: The requested AI Model is restricted for your API key's current tier.");
+      } else if (errorMsg.includes("400")) {
+        setError("UPLINK FAILURE (400): Bad Request. This usually means the API key is valid but lack permissions for the requested model.");
       } else {
-        setError(`AUDIT INTERRUPTED: ${errorMsg || "Connection to Google AI failed."}`);
+        setError(`AUDIT INTERRUPTED: ${errorMsg}`);
       }
       
-      // Remove the "failed" empty trial from the list if it failed early
-      setTrials(prev => prev.filter(t => t.evaluation || t.id.startsWith('AUD-')));
+      // Cleanup the list from failed attempts
+      setTrials(prev => prev.filter(t => t.evaluation || !t.id.startsWith('AUD-')));
     } finally {
       setIsProcessing(false);
     }
   };
 
-  // Prevent rendering before mount to avoid hydration mismatch
   if (!isMounted) return <div className="min-h-screen bg-[#05070a]" />;
 
   const renderContent = () => {
@@ -159,7 +161,6 @@ const App: React.FC = () => {
                 <button onClick={handleLogout} className="px-6 py-2 bg-rose-500/10 border border-rose-500/20 text-rose-500 text-xs font-black uppercase tracking-widest rounded-xl hover:bg-rose-500 hover:text-white transition-all">Terminate Session</button>
              </div>
              
-             {/* API Error Notification */}
              {error && (
                <div className="max-w-7xl mx-auto px-8 mb-8">
                  <div className="p-6 bg-rose-500/10 border border-rose-500/30 rounded-[32px] flex items-center justify-between group">
@@ -208,10 +209,7 @@ const App: React.FC = () => {
       default:
         return (
           <>
-            <Hero 
-              onStart={() => navigate('get-started')} 
-              onWhitepaper={() => navigate('whitepaper')} 
-            />
+            <Hero onStart={() => navigate('get-started')} onWhitepaper={() => navigate('whitepaper')} />
             <WhatIsSection />
             <WhyMatters />
             <ForensicExample />
@@ -224,14 +222,8 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#05070a] text-slate-200 selection:bg-indigo-500/30 overflow-x-hidden flex flex-col">
-      <Header 
-        onNavigate={navigate} 
-        isLoggedIn={!!user} 
-        onLogout={handleLogout}
-      />
-      <main className="flex-1">
-        {renderContent()}
-      </main>
+      <Header onNavigate={navigate} isLoggedIn={!!user} onLogout={handleLogout} />
+      <main className="flex-1">{renderContent()}</main>
       <Footer onNavigate={navigate} />
     </div>
   );
