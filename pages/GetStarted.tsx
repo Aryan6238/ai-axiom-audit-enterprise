@@ -12,9 +12,9 @@ const GetStarted: React.FC<GetStartedProps> = ({ onStart }) => {
        <div className="grid md:grid-cols-2 gap-16 items-center">
           <div className="space-y-8">
              <div className="inline-block px-4 py-1.5 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-[10px] font-black uppercase tracking-widest">The Axiom Protocol</div>
-             <h1 className="text-5xl md:text-7xl font-black text-white tracking-tighter uppercase leading-[0.85]">Audit Your <br /><span className="text-slate-600">Intelligence</span></h1>
+             <h1 className="text-5xl md:text-7xl font-black text-white tracking-tighter uppercase leading-[0.85]">Audit Your <br /><span className="text-slate-600">AI’s Thinking</span></h1>
              <p className="text-xl text-slate-400 font-medium leading-relaxed">
-               Axiom Audit provides the mission-critical infrastructure to transition LLMs from experimental prototypes to production-grade enterprise assets.
+               Axiom Audit provides the critical infrastructure that helps companies move AI models from testing and experimentation to fully reliable, production-ready systems that can be trusted in enterprise environments.
              </p>
              <div className="flex space-x-4">
                 <button onClick={onStart} className="px-10 py-5 bg-white text-black font-black uppercase tracking-widest text-xs rounded-2xl shadow-xl hover:bg-indigo-50 transition-all">Provision Access</button>
@@ -29,17 +29,17 @@ const GetStarted: React.FC<GetStartedProps> = ({ onStart }) => {
           {[
             { 
               title: "Legal & Liability", 
-              desc: "Automate verification for AI outputs against Indian laws (DPDP Act) and industry guidelines.",
+              desc: "Use automation to verify that AI-generated content complies with Indian data protection laws (DPDP Act) and relevant industry guidelines, reducing legal and liability risks.",
               assetId: "legal" as const
             },
             { 
-              title: "Financial Scrutiny", 
-              desc: "Validate model outputs for high-stakes financial advisory and reporting.",
+              title: "Financial Review", 
+              desc: "Thoroughly review AI-generated results to ensure accuracy and reliability in critical financial advisory and reporting tasks.",
               assetId: "finance" as const
             },
             { 
               title: "Clinical Accuracy", 
-              desc: "Ensure medical summaries remain factually anchored to verified research nodes.",
+              desc: "Ensure that all AI-generated medical summaries stay factually correct and are grounded in trusted, verified research sources.",
               assetId: "medical" as const
             }
           ].map((card, i) => (
