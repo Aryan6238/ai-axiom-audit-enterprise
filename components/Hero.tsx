@@ -31,7 +31,7 @@ const Hero: React.FC<HeroProps> = ({ onStart, onWhitepaper }) => {
         </h1>
 
         <p className="text-lg md:text-xl text-slate-400 max-w-3xl mx-auto leading-relaxed font-medium">
-          Deterministic verification for Large Language Models. We map, score, and certify AI reasoning for high-scrutiny enterprise deployments.
+          We provide deterministic verification for large AI models, mapping and scoring their reasoning to certify accuracy and reliability in critical enterprise deployments.
         </p>
 
         <div className="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-8 pt-8">
@@ -39,13 +39,13 @@ const Hero: React.FC<HeroProps> = ({ onStart, onWhitepaper }) => {
             onClick={onStart}
             className="w-full md:w-auto px-12 py-6 bg-white text-black font-black uppercase tracking-widest text-xs rounded-2xl hover:bg-indigo-50 transition-all hover:scale-105 shadow-[0_20px_50px_rgba(255,255,255,0.1)]"
           >
-            Provision Console Access
+            Launch Console
           </button>
           <button 
             onClick={onWhitepaper}
             className="w-full md:w-auto px-12 py-6 bg-transparent text-white font-black uppercase tracking-widest text-xs rounded-2xl border border-slate-800 hover:bg-white/5 transition-all"
           >
-            Alignment Whitepaper
+            AI Alignment Guide
           </button>
         </div>
       </div>
