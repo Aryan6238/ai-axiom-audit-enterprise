@@ -28,6 +28,18 @@ import ApiDocs from './pages/ApiDocs';
 
 type View = 'landing' | 'get-started' | 'whitepaper' | 'contact' | 'login' | 'signup' | 'console' | 'status' | 'pricing' | 'docs';
 
+// Fix: Use the AIStudio named interface to avoid type conflicts in global declaration
+interface AIStudio {
+  hasSelectedApiKey: () => Promise<boolean>;
+  openSelectKey: () => Promise<void>;
+}
+
+declare global {
+  interface Window {
+    aistudio: AIStudio;
+  }
+}
+
 const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<View>('landing');
   const [user, setUser] = useState<User | null>(null);
@@ -36,7 +48,6 @@ const App: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isMounted, setIsMounted] = useState(false);
 
-  // Fix Hydration Error #418: Only read localStorage AFTER mounting
   useEffect(() => {
     setIsMounted(true);
     
@@ -83,12 +94,20 @@ const App: React.FC = () => {
     setCurrentView('landing');
   };
 
+  const handleSelectKey = async () => {
+    try {
+      await window.aistudio.openSelectKey();
+      setError(null);
+    } catch (e) {
+      console.error("Key selection failed", e);
+    }
+  };
+
   const handleRunAudit = async (q: string, r: string) => {
     setIsProcessing(true);
     setError(null);
     
     try {
-      // 1. Establish the "Gold Standard" baseline
       const truth = await deriveBenchmarkContext(q);
       
       const trial: EvalTrial = {
@@ -99,17 +118,14 @@ const App: React.FC = () => {
         timestamp: Date.now()
       };
 
-      // Add to state immediately to show progress
       setTrials(prev => [trial, ...prev]);
       
-      // 2. Run Parallel Forensic Analysis
       const [ev, fc, hb] = await Promise.all([
         evaluateTrial(trial),
         factCheckTrial(trial),
         generateTrialFeedback(trial)
       ]);
 
-      // 3. Update the record with full results
       setTrials(prev => {
         const updated = prev.map(t => t.id === trial.id ? { ...t, evaluation: ev, factCheck: fc, humanFeedback: hb } : t);
         localStorage.setItem('axiom_audit_history', JSON.stringify(updated));
@@ -120,18 +136,20 @@ const App: React.FC = () => {
       console.error("Audit Execution Failed:", e);
       const errorMsg = e.message || "Unknown communication error.";
       
-      // Enhanced Error Filtering for more accurate user feedback
-      if (errorMsg.includes("API_KEY_INVALID") || errorMsg.includes("API key not found") || errorMsg.includes("403")) {
-        setError("CRITICAL: Your Gemini API Key is invalid or not yet propagated. Please check Vercel Settings and REDEPLOY.");
+      // Handle "Requested entity was not found" error as per Gemini guidelines
+      if (errorMsg.includes("Requested entity was not found.")) {
+        setError("AUTHENTICATION EXPIRED: Please re-select your API key to continue.");
+        await window.aistudio.openSelectKey();
+      } else if (errorMsg.includes("API_KEY_INVALID") || errorMsg.includes("API key not found") || errorMsg.includes("403")) {
+        setError("AUTHENTICATION ERROR: Your Gemini API Key is invalid or not yet propagated. Please ensure you are using a key from a PAID Google Cloud Project.");
       } else if (errorMsg.includes("model not found") || errorMsg.includes("404") || errorMsg.includes("not enabled")) {
-        setError("CRITICAL: The requested AI Model is restricted for your API key's current tier.");
+        setError("PROVISIONING ERROR: The requested AI Model (gemini-3-flash-preview) is restricted for your API key's current tier.");
       } else if (errorMsg.includes("400")) {
-        setError("UPLINK FAILURE (400): Bad Request. This usually means the API key is valid but lack permissions for the requested model.");
+        setError("UPLINK FAILURE (400): Bad Request. This usually indicates a schema mismatch or project permission issue. Try 'Re-authenticating' below.");
       } else {
         setError(`AUDIT INTERRUPTED: ${errorMsg}`);
       }
       
-      // Cleanup the list from failed attempts
       setTrials(prev => prev.filter(t => t.evaluation || !t.id.startsWith('AUD-')));
     } finally {
       setIsProcessing(false);
@@ -158,7 +176,10 @@ const App: React.FC = () => {
                    <h2 className="text-4xl font-black text-white tracking-tighter uppercase">Forensic Console</h2>
                    <p className="text-slate-500 text-sm font-medium">Session Active for: <span className="text-indigo-400">{user?.name}</span> @ {user?.company || 'Independent'}</p>
                 </div>
-                <button onClick={handleLogout} className="px-6 py-2 bg-rose-500/10 border border-rose-500/20 text-rose-500 text-xs font-black uppercase tracking-widest rounded-xl hover:bg-rose-500 hover:text-white transition-all">Terminate Session</button>
+                <div className="flex space-x-4">
+                  <button onClick={handleSelectKey} className="px-6 py-2 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-black uppercase tracking-widest rounded-xl hover:bg-indigo-500 hover:text-white transition-all">Re-authenticate Key</button>
+                  <button onClick={handleLogout} className="px-6 py-2 bg-rose-500/10 border border-rose-500/20 text-rose-500 text-xs font-black uppercase tracking-widest rounded-xl hover:bg-rose-500 hover:text-white transition-all">Terminate Session</button>
+                </div>
              </div>
              
              {error && (
@@ -173,9 +194,12 @@ const App: React.FC = () => {
                           <p className="text-slate-400 text-sm font-medium">{error}</p>
                        </div>
                     </div>
-                    <button onClick={() => setError(null)} className="text-slate-600 hover:text-white transition-colors">
-                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" /></svg>
-                    </button>
+                    <div className="flex items-center space-x-4">
+                      <button onClick={handleSelectKey} className="px-4 py-2 bg-rose-500 text-white text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-rose-600">Select Paid Project Key</button>
+                      <button onClick={() => setError(null)} className="text-slate-600 hover:text-white transition-colors">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" /></svg>
+                      </button>
+                    </div>
                  </div>
                </div>
              )}
