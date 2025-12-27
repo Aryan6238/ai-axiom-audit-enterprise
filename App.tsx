@@ -34,31 +34,36 @@ const App: React.FC = () => {
   const [trials, setTrials] = useState<EvalTrial[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isMounted, setIsMounted] = useState(false);
 
+  // Fix Hydration Error #418: Only read localStorage AFTER mounting
   useEffect(() => {
-    // 1. Initial Auth Check
+    setIsMounted(true);
+    
     const currentUser = authService.getCurrentUser();
     if (currentUser) {
       setUser(currentUser);
     }
     
-    // 2. Load History
     const savedTrials = localStorage.getItem('axiom_audit_history');
     if (savedTrials) {
-      try { setTrials(JSON.parse(savedTrials)); } catch (e) {}
+      try { 
+        setTrials(JSON.parse(savedTrials)); 
+      } catch (e) {
+        console.error("Failed to parse history", e);
+      }
     }
   }, []);
 
   const navigate = (view: View) => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    setError(null);
     
-    // Protected route check
     if (view === 'console' && !user) {
       setCurrentView('login');
       return;
     }
     
-    // If user is already logged in and goes to login/signup, redirect to console
     if ((view === 'login' || view === 'signup') && user) {
       setCurrentView('console');
       return;
@@ -81,8 +86,11 @@ const App: React.FC = () => {
   const handleRunAudit = async (q: string, r: string) => {
     setIsProcessing(true);
     setError(null);
+    
     try {
+      // 1. Establish the "Gold Standard" baseline
       const truth = await deriveBenchmarkContext(q);
+      
       const trial: EvalTrial = {
         id: `AUD-${Math.random().toString(36).substr(2, 6).toUpperCase()}`,
         userQuestion: q,
@@ -90,25 +98,45 @@ const App: React.FC = () => {
         derivedGroundTruth: truth,
         timestamp: Date.now()
       };
+
+      // Add to state immediately to show progress
       setTrials(prev => [trial, ...prev]);
       
+      // 2. Run Parallel Forensic Analysis
       const [ev, fc, hb] = await Promise.all([
         evaluateTrial(trial),
         factCheckTrial(trial),
         generateTrialFeedback(trial)
       ]);
 
+      // 3. Update the record with full results
       setTrials(prev => {
         const updated = prev.map(t => t.id === trial.id ? { ...t, evaluation: ev, factCheck: fc, humanFeedback: hb } : t);
         localStorage.setItem('axiom_audit_history', JSON.stringify(updated));
         return updated;
       });
+
     } catch (e: any) {
-      setError(e.message || "Audit interrupted.");
+      console.error("Audit Execution Failed:", e);
+      // Detailed error reporting for the user
+      const errorMsg = e.message || "";
+      if (errorMsg.includes("API_KEY_INVALID")) {
+        setError("CRITICAL: Your Gemini API Key is invalid. Check Vercel Environment Variables.");
+      } else if (errorMsg.includes("404") || errorMsg.includes("model")) {
+        setError("CRITICAL: The requested AI Model (Gemini 3 Pro) is not available for your API key yet.");
+      } else {
+        setError(`AUDIT INTERRUPTED: ${errorMsg || "Connection to Google AI failed."}`);
+      }
+      
+      // Remove the "failed" empty trial from the list if it failed early
+      setTrials(prev => prev.filter(t => t.evaluation || t.id.startsWith('AUD-')));
     } finally {
       setIsProcessing(false);
     }
   };
+
+  // Prevent rendering before mount to avoid hydration mismatch
+  if (!isMounted) return <div className="min-h-screen bg-[#05070a]" />;
 
   const renderContent = () => {
     switch(currentView) {
@@ -131,10 +159,30 @@ const App: React.FC = () => {
                 <button onClick={handleLogout} className="px-6 py-2 bg-rose-500/10 border border-rose-500/20 text-rose-500 text-xs font-black uppercase tracking-widest rounded-xl hover:bg-rose-500 hover:text-white transition-all">Terminate Session</button>
              </div>
              
+             {/* API Error Notification */}
+             {error && (
+               <div className="max-w-7xl mx-auto px-8 mb-8">
+                 <div className="p-6 bg-rose-500/10 border border-rose-500/30 rounded-[32px] flex items-center justify-between group">
+                    <div className="flex items-center space-x-4">
+                       <div className="w-10 h-10 rounded-full bg-rose-500 flex items-center justify-center text-white">
+                          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                       </div>
+                       <div>
+                          <h4 className="text-rose-500 font-black uppercase text-xs tracking-widest">Uplink Failure Detected</h4>
+                          <p className="text-slate-400 text-sm font-medium">{error}</p>
+                       </div>
+                    </div>
+                    <button onClick={() => setError(null)} className="text-slate-600 hover:text-white transition-colors">
+                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" /></svg>
+                    </button>
+                 </div>
+               </div>
+             )}
+
              <div className="max-w-[1440px] mx-auto px-4 md:px-8">
                <div className="flex flex-col lg:flex-row overflow-hidden min-h-[850px] border border-slate-800 rounded-[48px] bg-[#0c0f14]/80 backdrop-blur-3xl shadow-2xl">
                  <AuditorWorkspace onRunAudit={handleRunAudit} isProcessing={isProcessing} />
-                 <section className="flex-1 overflow-y-auto p-8 md:p-16 space-y-16 bg-[#05070a]/30">
+                 <section className="flex-1 overflow-y-auto p-8 md:p-16 space-y-16 bg-[#05070a]/30 custom-scrollbar">
                     {trials.length === 0 && !isProcessing ? (
                       <div className="h-full flex flex-col items-center justify-center opacity-40 text-center space-y-4">
                          <div className="w-16 h-16 rounded-3xl bg-slate-800 flex items-center justify-center">
@@ -144,7 +192,13 @@ const App: React.FC = () => {
                          <p className="text-xs text-slate-500 uppercase tracking-widest font-black max-w-xs">Initialize a scan from the left workspace to begin forensic mapping.</p>
                       </div>
                     ) : (
-                      trials.map(t => <EvaluationResultCard key={t.id} trial={t} onDelete={() => setTrials(prev => prev.filter(p => p.id !== t.id))} />)
+                      trials.map(t => (
+                        <EvaluationResultCard 
+                          key={t.id} 
+                          trial={t} 
+                          onDelete={() => setTrials(prev => prev.filter(p => p.id !== t.id))} 
+                        />
+                      ))
                     )}
                  </section>
                </div>
