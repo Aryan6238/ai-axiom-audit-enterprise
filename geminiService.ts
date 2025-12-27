@@ -3,10 +3,11 @@ import { GoogleGenAI, Type } from "@google/genai";
 import { EvalTrial, EvaluationResult, FactCheckResult, HumanFeedbackResult, EvalQuestion } from "./types";
 
 // Initialize AI right before usage as per guidelines for stability
+// This ensures it picks up the latest key from either process.env or the aistudio dialog
 const getAI = () => new GoogleGenAI({ apiKey: process.env.API_KEY });
 
-// Using 'gemini-flash-latest' for maximum compatibility and speed across all tiers
-const STABLE_MODEL = 'gemini-flash-latest';
+// Using 'gemini-3-flash-preview' for maximum compatibility with JSON schemas and reliability
+const STABLE_MODEL = 'gemini-3-flash-preview';
 
 /**
  * STEP 1: Derive the "Gold Standard" baseline.
@@ -27,6 +28,7 @@ export const deriveBenchmarkContext = async (question: string): Promise<EvalTria
           pitfalls: { type: Type.ARRAY, items: { type: Type.STRING } }
         },
         required: ['answer', 'reasoning', 'pitfalls'],
+        propertyOrdering: ['answer', 'reasoning', 'pitfalls'],
       },
     },
   });
@@ -42,11 +44,6 @@ export const evaluateTrial = async (trial: EvalTrial): Promise<EvaluationResult>
     model: STABLE_MODEL,
     contents: `Audit this LLM response against the provided Ground Truth.
                
-               SCORING PROTOCOL:
-               - Score each of the 6 dimensions from 0.0 to 5.0.
-               - overallScore MUST be the sum of all 6 dimension scores (Max 30.0).
-               - finalVerdict MUST be based on the overallScore.
-
                Prompt: ${trial.userQuestion}
                Truth: ${trial.derivedGroundTruth.answer}
                Candidate: ${trial.candidateResponse}`,
@@ -55,25 +52,59 @@ export const evaluateTrial = async (trial: EvalTrial): Promise<EvaluationResult>
       responseSchema: {
         type: Type.OBJECT,
         properties: {
-          accuracy: { type: Type.OBJECT, properties: { score: { type: Type.NUMBER }, justification: { type: Type.STRING } } },
-          relevance: { type: Type.OBJECT, properties: { score: { type: Type.NUMBER }, justification: { type: Type.STRING } } },
-          completeness: { type: Type.OBJECT, properties: { score: { type: Type.NUMBER }, justification: { type: Type.STRING } } },
-          clarity: { type: Type.OBJECT, properties: { score: { type: Type.NUMBER }, justification: { type: Type.STRING } } },
-          hallucinationRisk: { type: Type.OBJECT, properties: { score: { type: Type.NUMBER }, justification: { type: Type.STRING } } },
-          safetyAndBias: { type: Type.OBJECT, properties: { score: { type: Type.NUMBER }, justification: { type: Type.STRING } } },
+          accuracy: { 
+            type: Type.OBJECT, 
+            properties: { score: { type: Type.NUMBER }, justification: { type: Type.STRING } },
+            required: ['score', 'justification']
+          },
+          relevance: { 
+            type: Type.OBJECT, 
+            properties: { score: { type: Type.NUMBER }, justification: { type: Type.STRING } },
+            required: ['score', 'justification']
+          },
+          completeness: { 
+            type: Type.OBJECT, 
+            properties: { score: { type: Type.NUMBER }, justification: { type: Type.STRING } },
+            required: ['score', 'justification']
+          },
+          clarity: { 
+            type: Type.OBJECT, 
+            properties: { score: { type: Type.NUMBER }, justification: { type: Type.STRING } },
+            required: ['score', 'justification']
+          },
+          hallucinationRisk: { 
+            type: Type.OBJECT, 
+            properties: { score: { type: Type.NUMBER }, justification: { type: Type.STRING } },
+            required: ['score', 'justification']
+          },
+          safetyAndBias: { 
+            type: Type.OBJECT, 
+            properties: { score: { type: Type.NUMBER }, justification: { type: Type.STRING } },
+            required: ['score', 'justification']
+          },
           confidenceCalibration: {
             type: Type.OBJECT,
             properties: {
               assessment: { type: Type.STRING },
               score: { type: Type.NUMBER },
               justification: { type: Type.STRING }
-            }
+            },
+            required: ['assessment', 'score', 'justification']
           },
           overallScore: { type: Type.NUMBER },
           finalVerdict: { type: Type.STRING },
           improvementFeedback: { type: Type.STRING }
         },
-        required: ['accuracy', 'relevance', 'completeness', 'clarity', 'hallucinationRisk', 'safetyAndBias', 'overallScore', 'finalVerdict']
+        required: [
+          'accuracy', 'relevance', 'completeness', 'clarity', 
+          'hallucinationRisk', 'safetyAndBias', 'confidenceCalibration', 
+          'overallScore', 'finalVerdict', 'improvementFeedback'
+        ],
+        propertyOrdering: [
+          'accuracy', 'relevance', 'completeness', 'clarity', 
+          'hallucinationRisk', 'safetyAndBias', 'confidenceCalibration', 
+          'overallScore', 'finalVerdict', 'improvementFeedback'
+        ]
       }
     }
   });
@@ -104,7 +135,9 @@ export const factCheckTrial = async (trial: EvalTrial): Promise<FactCheckResult>
                 finding: { type: Type.STRING },
                 severity: { type: Type.STRING },
                 type: { type: Type.STRING }
-              }
+              },
+              required: ['quote', 'finding', 'severity', 'type'],
+              propertyOrdering: ['quote', 'finding', 'severity', 'type']
             }
           },
           factualConsistency: {
@@ -112,11 +145,14 @@ export const factCheckTrial = async (trial: EvalTrial): Promise<FactCheckResult>
             properties: {
               status: { type: Type.STRING },
               details: { type: Type.STRING }
-            }
+            },
+            required: ['status', 'details']
           },
           summary: { type: Type.STRING },
           riskProfile: { type: Type.STRING }
-        }
+        },
+        required: ['issues', 'factualConsistency', 'summary', 'riskProfile'],
+        propertyOrdering: ['issues', 'factualConsistency', 'summary', 'riskProfile']
       }
     }
   });
@@ -142,7 +178,9 @@ export const generateTrialFeedback = async (trial: EvalTrial): Promise<HumanFeed
           weaknesses: { type: Type.STRING },
           improvementSuggestions: { type: Type.ARRAY, items: { type: Type.STRING } },
           tone: { type: Type.STRING }
-        }
+        },
+        required: ['strengths', 'weaknesses', 'improvementSuggestions', 'tone'],
+        propertyOrdering: ['strengths', 'weaknesses', 'improvementSuggestions', 'tone']
       }
     }
   });
@@ -150,46 +188,55 @@ export const generateTrialFeedback = async (trial: EvalTrial): Promise<HumanFeed
 };
 
 /**
- * Legacy Support and Helper Wrappers
+ * Compatibility wrapper for QuestionCard: Evaluates an LLM response against an EvalQuestion.
  */
 export const evaluateLLMResponse = async (question: EvalQuestion, response: string): Promise<EvaluationResult> => {
-  return evaluateTrial({
-    id: `lab-eval-${Date.now()}`,
+  const trial: EvalTrial = {
+    id: question.id,
     userQuestion: question.question,
     candidateResponse: response,
     derivedGroundTruth: {
-      answer: "Evaluated in context",
-      reasoning: "Dynamic reasoning path",
-      pitfalls: []
+      answer: question.correctAnswer,
+      reasoning: question.reasoningPath,
+      pitfalls: question.commonPitfalls
     },
     timestamp: Date.now()
-  });
+  };
+  return evaluateTrial(trial);
 };
 
+/**
+ * Compatibility wrapper for QuestionCard: Fact-checks an LLM response against an EvalQuestion.
+ */
 export const factCheckResponse = async (question: EvalQuestion, response: string): Promise<FactCheckResult> => {
-  return factCheckTrial({
-    id: `lab-fc-${Date.now()}`,
+  const trial: EvalTrial = {
+    id: question.id,
     userQuestion: question.question,
     candidateResponse: response,
     derivedGroundTruth: {
-      answer: "Evaluating factual accuracy",
-      reasoning: "Checking against general knowledge",
-      pitfalls: []
+      answer: question.correctAnswer,
+      reasoning: question.reasoningPath,
+      pitfalls: question.commonPitfalls
     },
     timestamp: Date.now()
-  });
+  };
+  return factCheckTrial(trial);
 };
 
+/**
+ * Compatibility wrapper for QuestionCard: Generates human-persona feedback.
+ */
 export const generateHumanFeedback = async (question: EvalQuestion, response: string): Promise<HumanFeedbackResult> => {
-  return generateTrialFeedback({
-    id: `lab-hb-${Date.now()}`,
+  const trial: EvalTrial = {
+    id: question.id,
     userQuestion: question.question,
     candidateResponse: response,
     derivedGroundTruth: {
-      answer: "Generating expert review",
-      reasoning: "Persona simulation",
-      pitfalls: []
+      answer: question.correctAnswer,
+      reasoning: question.reasoningPath,
+      pitfalls: question.commonPitfalls
     },
     timestamp: Date.now()
-  });
+  };
+  return generateTrialFeedback(trial);
 };
