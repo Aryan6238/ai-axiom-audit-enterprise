@@ -71,6 +71,10 @@ End of Transmission.
   }
 });
 
+app.get('/', (req, res) => {
+  res.send('Axiom Audit Backend is running! Use /api/contact for form submissions.');
+});
+
 app.listen(PORT, () => {
   console.log(`[AXIOM] Forensic Email Relay active on port ${PORT}`);
 });
