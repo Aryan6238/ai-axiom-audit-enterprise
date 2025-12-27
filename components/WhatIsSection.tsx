@@ -12,9 +12,9 @@ const WhatIsSection: React.FC = () => {
           <div className="inline-block px-4 py-1.5 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-[10px] font-black uppercase tracking-widest">
             The Philosophy
           </div>
-          <h2 className="text-5xl md:text-7xl font-black text-white tracking-tighter leading-[0.9]">
-            A Measurement <br />
-            <span className="text-indigo-500">Not an Interface</span>
+          <h2 className="text-4xl md:text-6xl font-black text-white tracking-tighter leading-[0.9]">
+            A  Measurement <br />
+            <span className="text-indigo-500">Not  an  Interface</span>
           </h2>
           <p className="text-xl text-slate-400 leading-relaxed font-medium">
             Standard chat interfaces treat AI as a conversational partner. Axiom Audit treats AI as a source of forensic data. We provide the mission-critical infrastructure required to transition Large Language Models from experimental labs to production-grade enterprise environments.
