@@ -158,7 +158,7 @@ const EvaluationResultCard: React.FC<EvaluationResultCardProps> = ({ trial, onDe
                <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 blur-[100px] rounded-full -translate-y-1/2 translate-x-1/2" />
                <div className="text-center md:text-left space-y-2 relative z-10">
                   <span className="text-[11px] font-black uppercase opacity-60 tracking-[0.3em]">Final_Audit_Verdict</span>
-                  <h3 className="text-3xl md:text-4xl font-[900] tracking-tighter uppercase italic leading-none">{trial.evaluation!.finalVerdict}</h3>
+                  <h3 className="text-1xl md:text-2xl font-[900] tracking-tighter uppercase italic leading-none">{trial.evaluation!.finalVerdict}</h3>
                </div>
                <div className="mt-8 md:mt-0 flex space-x-6 relative z-10">
                   <div className="px-10 py-7 bg-black/40 rounded-3xl border border-white/5 text-center">
