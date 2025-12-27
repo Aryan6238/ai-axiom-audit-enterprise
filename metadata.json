@@ -1,0 +1,9 @@
+
+{
+  "name": "Axiom Audit Enterprise",
+  "description": "Production forensic evaluation engine. Securely audit LLM reasoning with real-time auth and database persistence.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
