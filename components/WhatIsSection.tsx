@@ -13,17 +13,17 @@ const WhatIsSection: React.FC = () => {
             The Philosophy
           </div>
           <h2 className="text-4xl md:text-6xl font-black text-white tracking-tighter leading-[0.9]">
-            A  Measurement <br />
-            <span className="text-indigo-500">Not  an  Interface</span>
+           "This is about assessment, <br />
+            <span className="text-indigo-500">not appearance.”</span>
           </h2>
           <p className="text-xl text-slate-400 leading-relaxed font-medium">
-            Standard chat interfaces treat AI as a conversational partner. Axiom Audit treats AI as a source of forensic data. We provide the mission-critical infrastructure required to transition Large Language Models from experimental labs to production-grade enterprise environments.
+            Most chat tools treat AI like someone you talk to. Axiom Audit treats AI as something that must be carefully examined and verified. We provide the essential systems needed to move AI from experiments into reliable, real-world business use.
           </p>
           
           <div className="p-8 bg-indigo-600/5 border border-indigo-500/10 rounded-[32px] space-y-4">
             <h4 className="text-xs font-black uppercase tracking-widest text-white">Why we are different</h4>
             <p className="text-sm text-slate-500 leading-relaxed font-medium">
-              While chatbots aim for conversational fluidity, Axiom aims for logical scrutiny. We assignment objective risk scores and generate legally defensible audit trails for institutional logging.
+              Chatbots focus on smooth conversation. Axiom focuses on careful, logical checking. We assign clear risk scores and create audit records that organizations can trust and store for compliance.
             </p>
           </div>
         </div>
