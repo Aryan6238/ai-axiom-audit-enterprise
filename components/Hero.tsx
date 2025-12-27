@@ -26,8 +26,8 @@ const Hero: React.FC<HeroProps> = ({ onStart, onWhitepaper }) => {
         </div>
 
         <h1 className="text-5xl md:text-7xl font-black text-white tracking-wider leading-[0.85] uppercase italic">
-          Scrutinize Every <br />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 via-indigo-400 to-emerald-400 not-italic"> Neural Path</span>
+          "Examine Every Step of <br />
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 via-indigo-400 to-emerald-400 not-italic"> AI Reasoning."</span>
         </h1>
 
         <p className="text-lg md:text-xl text-slate-400 max-w-3xl mx-auto leading-relaxed font-medium">
