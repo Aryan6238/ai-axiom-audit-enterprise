@@ -158,16 +158,16 @@ const EvaluationResultCard: React.FC<EvaluationResultCardProps> = ({ trial, onDe
                <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 blur-[100px] rounded-full -translate-y-1/2 translate-x-1/2" />
                <div className="text-center md:text-left space-y-2 relative z-10">
                   <span className="text-[11px] font-black uppercase opacity-60 tracking-[0.3em]">Final_Audit_Verdict</span>
-                  <h3 className="text-1xl md:text-2xl font-[900] tracking-tighter uppercase italic leading-none">{trial.evaluation!.finalVerdict}</h3>
+                  <h3 className="text-1xl md:text-1xl font-[900] tracking-tighter uppercase italic leading-none">{trial.evaluation!.finalVerdict}</h3>
                </div>
                <div className="mt-8 md:mt-0 flex space-x-6 relative z-10">
                   <div className="px-10 py-7 bg-black/40 rounded-3xl border border-white/5 text-center">
                     <span className="text-[10px] font-black uppercase opacity-60 tracking-widest block mb-2">Calibration</span>
-                    <span className="text-base font-black uppercase tracking-[0.2em]">{trial.evaluation!.confidenceCalibration.assessment}</span>
+                    <span className="text-sm font-black uppercase tracking-[0.2em]">{trial.evaluation!.confidenceCalibration.assessment}</span>
                   </div>
                   <div className="px-10 py-7 bg-black/40 rounded-3xl border border-white/5 text-center">
                     <span className="text-[10px] font-black uppercase opacity-60 tracking-widest block mb-2">Aggregate_Score</span>
-                    <span className="text-4xl font-[900] tracking-tighter">{trial.evaluation!.overallScore}<span className="text-sm opacity-30 font-bold ml-1">/30</span></span>
+                    <span className="text-3xl font-[900] tracking-tighter">{trial.evaluation!.overallScore}<span className="text-sm opacity-30 font-bold ml-1">/30</span></span>
                   </div>
                </div>
             </div>
@@ -200,7 +200,7 @@ const EvaluationResultCard: React.FC<EvaluationResultCardProps> = ({ trial, onDe
                       <div className="col-span-full mt-6 p-10 bg-[#05070a] rounded-[40px] border border-white/5 relative overflow-hidden group">
                         <div className="absolute top-0 left-0 w-2 h-full bg-indigo-600 group-hover:w-3 transition-all" />
                         <span className="text-[10px] font-black uppercase text-indigo-500 tracking-[0.3em] block mb-6">Lead_Auditor_Justification</span>
-                        <p className="text-2xl text-slate-300 leading-relaxed font-medium italic">"{trial.evaluation!.improvementFeedback}"</p>
+                        <p className="text-1xl text-slate-300 leading-relaxed font-medium italic">"{trial.evaluation!.improvementFeedback}"</p>
                       </div>
                     </div>
                   )}
@@ -264,14 +264,14 @@ const EvaluationResultCard: React.FC<EvaluationResultCardProps> = ({ trial, onDe
                                 <div className="w-2 h-8 bg-emerald-500 rounded-full shadow-[0_0_15px_rgba(16,185,129,0.5)]" />
                                 <h5 className="text-[12px] font-black uppercase text-white tracking-[0.2em]">Structural_Strengths</h5>
                              </div>
-                             <p className="text-lg text-slate-400 leading-relaxed bg-[#05070a] p-10 rounded-[40px] border border-emerald-500/10 min-h-[180px] font-medium italic">"{trial.humanFeedback.strengths}"</p>
+                             <p className="text-base text-slate-400 leading-relaxed bg-[#05070a] p-10 rounded-[40px] border border-emerald-500/10 min-h-[180px] font-medium italic">"{trial.humanFeedback.strengths}"</p>
                           </div>
                           <div className="space-y-6">
                              <div className="flex items-center space-x-4">
                                 <div className="w-2 h-8 bg-rose-500 rounded-full shadow-[0_0_15px_rgba(244,63,94,0.5)]" />
                                 <h5 className="text-[12px] font-black uppercase text-white tracking-[0.2em]">Optimization_Needs</h5>
                              </div>
-                             <p className="text-lg text-slate-400 leading-relaxed bg-[#05070a] p-10 rounded-[40px] border border-rose-500/10 min-h-[180px] font-medium italic">"{trial.humanFeedback.weaknesses}"</p>
+                             <p className="text-base text-slate-400 leading-relaxed bg-[#05070a] p-10 rounded-[40px] border border-rose-500/10 min-h-[180px] font-medium italic">"{trial.humanFeedback.weaknesses}"</p>
                           </div>
                        </div>
                        <div className="space-y-10">
