@@ -13,8 +13,13 @@ export interface ContactInquiry {
 }
 
 const INQUIRY_DB_KEY = 'axiom_inquiry_ledger';
-// Point this to your local server.js instance
-const RELAY_ENDPOINT = 'http://localhost:3001/api/contact';
+
+/**
+ * RELAY_URL:
+ * Pointing to the deployed Render backend.
+ */
+const RELAY_URL = 'https://aryanj-ai-axiom-audit-system.onrender.com';
+const RELAY_ENDPOINT = `${RELAY_URL}/api/contact`;
 
 export const contactService = {
   /**
@@ -63,9 +68,7 @@ export const contactService = {
       }
     } catch (err: any) {
       console.warn("[AXIOM] Email relay unavailable. Inquiries saved to local forensic ledger only.", err);
-      // We throw error here only if we want to force SMTP for the UI "success" state
-      // For this student demo, we'll throw if the relay fails so the user knows they need the backend.
-      throw new Error("SMTP Relay Offline. Ensure the Axiom backend server is active with valid credentials.");
+      throw new Error(`SMTP Relay Offline. Ensure the backend at ${RELAY_URL} is live.`);
     }
   },
 
