@@ -7,7 +7,7 @@ const ForensicExample: React.FC = () => {
       <div className="grid lg:grid-cols-2 gap-16 items-start">
         <div className="space-y-8">
           <div className="inline-block px-4 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-black uppercase tracking-widest">Forensic Deep-Dive</div>
-          <h2 className="text-5xl font-black text-white tracking-normal uppercase leading-none">Thorough Review <br /> in Practice </h2>
+          <h2 className="text-5xl font-black text-white tracking-wider uppercase leading-none">Thorough Review <br /> in Practice </h2>
           <p className="text-lg text-slate-400 leading-relaxed font-medium">
             While basic tools only look for keywords, Axiom checks reasoning and factual accuracy. 
              Below is a real example where our system caught a “Confident Hallucination” in a financial advisory AI.
