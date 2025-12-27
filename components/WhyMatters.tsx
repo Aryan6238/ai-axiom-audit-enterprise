@@ -20,7 +20,7 @@ const WhyMatters: React.FC = () => {
            </div>
            <h2 className="text-4xl md:text-6xl font-black text-white tracking-tighter leading-[0.9]">
              “Why we must <br />
-             <span className="text-emerald-500 text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-emerald-300">always verify things</span>
+             <span className="text-emerald-500 text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-emerald-300">always verify things"</span>
            </h2>
            <p className="text-xl text-slate-400 leading-relaxed font-medium">
              As AI models move from testing to real-world use, the chance of serious mistakes increases. In regulated fields like finance, law, and healthcare, even a small error can have huge consequences.
