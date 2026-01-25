@@ -167,7 +167,7 @@ const EvaluationResultCard: React.FC<EvaluationResultCardProps> = ({ trial, onDe
                   </div>
                   <div className="px-10 py-7 bg-black/40 rounded-3xl border border-white/5 text-center">
                     <span className="text-[10px] font-black uppercase opacity-60 tracking-widest block mb-2">Aggregate_Score</span>
-                    <span className="text-3xl font-[900] tracking-tighter">{trial.evaluation!.overallScore}<span className="text-sm opacity-30 font-bold ml-1">/10</span></span>
+                    <span className="text-3xl font-[900] tracking-tighter">{trial.evaluation!.overallScore}<span className="text-sm opacity-30 font-bold ml-1">/30</span></span>
                   </div>
                </div>
             </div>
