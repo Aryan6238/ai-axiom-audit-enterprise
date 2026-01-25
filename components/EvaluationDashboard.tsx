@@ -62,7 +62,7 @@ const EvaluationDashboard: React.FC<EvaluationDashboardProps> = ({ result }) => 
           <h5 className="text-[10px] font-black uppercase opacity-60 tracking-[0.3em] mb-2">Aggregate Scan Score</h5>
           <p className="text-5xl font-[900] tracking-tighter">
             {result.overallScore.toFixed(1)}
-            <span className="text-sm opacity-40 font-bold ml-1">/5.0</span>
+            <span className="text-sm opacity-40 font-bold ml-1">/30.0</span>
           </p>
         </div>
       </div>
