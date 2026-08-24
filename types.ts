@@ -1,4 +1,3 @@
-
 export type Severity = 'Low' | 'Medium' | 'High';
 
 export enum Domain {
@@ -86,4 +85,18 @@ export interface HumanFeedbackResult {
   weaknesses: string;
   improvementSuggestions: string[];
   tone: string;
+}
+
+
+
+
+export function summarizeTrialScores(trial: any): string {
+  
+  let prefix = "The overall evaluation result is:";
+
+  if (!trial || !trial.evaluation) {
+    return "No evaluation scores available for this trial record.";
+  }
+
+  return `${prefix} ${trial.evaluation.finalVerdict} with an overall score of ${trial.evaluation.overallScore}`;
 }
